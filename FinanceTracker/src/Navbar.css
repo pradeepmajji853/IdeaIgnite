@@ -1,0 +1,27 @@
+.Navbar{
+    background-color: rgb(191, 224, 244);
+    border-radius: 20px;
+    margin-top: 10px;
+    display: flex;
+    height: 50px;
+    line-height: 50px;
+}
+.Navbar h1{
+    margin-left: 100px;
+}
+.Navbar ul{
+    display: flex;
+    justify-content: flex-end;
+    margin-left: 600px;
+    font-size: 1.25rem;  
+    list-style: none;
+    gap: 50px;
+}
+.Navbar li a {
+    text-decoration: none;
+    transition: text-decoration 0.3s ease;
+  }
+  
+  .Navbar li:hover a {
+    text-decoration: underline;
+  }
