@@ -17,7 +17,7 @@ export default function Navbar() {
         <li>
           <a>SignUp</a>
         </li>
-
+        <li class="divider"></li>
         <li>
           <a>Login</a>
         </li>
