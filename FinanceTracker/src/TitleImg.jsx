@@ -3,7 +3,7 @@ import "./TitleImg.css"
 export default function TitleImg(){
     return(
         <div className="TitleImg">
-            <img src="/TitleImg.png"/>
+            <img src="assets/TitleImg.png"/>
         </div>
     )
 

@@ -1,5 +1,6 @@
 import './App.css'
 import Heropage from './Heropage.jsx'
+import Features from "./Features.jsx"
 
 
 function App() {
@@ -7,6 +8,7 @@ function App() {
   return (
     <>
     <Heropage/>
+    <Features/>
     </>
     
   )
