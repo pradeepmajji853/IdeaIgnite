@@ -31,11 +31,11 @@ export default function Getstarted() {
         </div>
         <div className="step2content">
           <GScontent 
-            title="Budgeting" 
+            title="Track youe expenses" 
             content={[
-              "Create budgets to manage your expenses",
-              "Get notifications for budget limits",
-              "Analyze your spending patterns"
+              "Get featured graphic for your expenses and income",
+              "Analyze your spending patterns",
+              "See where most of your money goes"
             ]} 
           />
         </div>
@@ -43,16 +43,17 @@ export default function Getstarted() {
       <div className="step3">
         <div className="step3content">
           <GScontent 
-            title="Savings" 
+            title="Smart budgets, Savings e-wallet" 
             content={[
-              "Set up savings goals",
-              "Track your savings progress",
-              "Automate savings from your income"
+              "Set up smart budgets and track your expense within a particular category",
+              "will make you not to overspend in a given category",
+              "Save money in our Savings e-wallet,even minimal savings everyday makes a huge saving at the end ",
+              "seemless withdrawals anytime "
             ]} 
           />
         </div>
         <div className="step3img">
-          <GSimage image="/assets/GSimage3.png" />
+          <GSimage image="/assets/GSimage4.png" />
         </div>
       </div>
     </div>
