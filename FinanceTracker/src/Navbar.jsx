@@ -6,13 +6,13 @@ export default function Navbar() {
         <h1>CampusCash</h1>
       <ul>
         <li>
-          <a>Home</a>
+          <a>Get started</a>
         </li>
         <li>
           <a>Bank Connect</a>
         </li>
         <li>
-          <a>About us </a>
+          <a>Features</a>
         </li>
         <li>
           <a>SignUp</a>

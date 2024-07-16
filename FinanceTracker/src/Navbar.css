@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Playwrite+HR+Lijeva:wght@100..400&family=Roboto+Slab:wght@100..900&display=swap');
 .Navbar{
 
-    background-color: rgb(191, 224, 244);
+    background-color: #d5eeff;
     border-radius: 20px;
     margin-top: 10px;
     display: flex;
@@ -34,11 +34,26 @@
     transition: text-decoration 0.3s ease;
   }
   
-  .Navbar li:hover a {
-    text-decoration: underline;
-  }
   .Navbar .divider{
     border-left: 2px solid black; 
   height: 50px; 
   margin: 5px 10px;
+  }
+  .Navbar ul li{
+    height: 60px;
+    width: auto;
+  }
+  .Navbar ul li:hover{
+    background-color: white;
+    border-radius: 75px;
+    transform: scale(1.25);
+  }
+  @keyframes fadeIn {
+    from{
+      opacity: 0.5;
+    }
+    to{
+      opacity: 1;
+    }
+    
   }

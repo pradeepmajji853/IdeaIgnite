@@ -6,7 +6,14 @@ import Typography from '@mui/material/Typography';
 
 export default function MediaCard({image,title,content}) {
   return (
-    <Card sx={{ maxWidth: 250}} className='Card'>
+    <div className="Card">
+    <Card sx={{ maxWidth: 250,
+    boxShadow:'0 8px 16px rgba(0,0,0,0.2)',
+      '&:hover': {
+            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)', 
+            transform: 'scale(1.10)'
+          }
+    }} >
       <CardMedia
         sx={{ height: 75 }}
         image={image}
@@ -20,5 +27,6 @@ export default function MediaCard({image,title,content}) {
         </Typography>
       </CardContent>
     </Card>
+    </div>
   );
 }
