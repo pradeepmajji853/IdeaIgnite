@@ -1,4 +1,7 @@
 
 .Dashboard{
     overflow-y: hidden;
+    background-image: url(assets/dashboardbg.png);
+    background-position: right;
+    background-repeat: no-repeat;
 }
