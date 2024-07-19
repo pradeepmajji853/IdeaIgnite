@@ -11,7 +11,7 @@ const saltRounds = 10;
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "karthekeya190",
+  password: "Pradeep@00",
   database: "campus_cash",
 });
 
@@ -95,6 +95,30 @@ app.post("/login", (req, res) => {
   });
 });
 
+app.post('/savingswallet', (req, res) => {
+  const { type, amount, date } = req.body;
+  const query = 'INSERT INTO savingswallet (type, amount, date) VALUES (?, ?, ?)';
+  db.query(query, [type, amount, date], (err, result) => {
+    if (err) {
+      console.error("Error inserting transaction:", err);
+      return res.status(500).send("An error occurred while inserting transaction into the database");
+    }
+    res.send('Transaction added to database');
+  });
+});
+
+app.get('/savingswallet', (req, res) => {
+  const query = 'SELECT * FROM savingswallet';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching transactions:", err);
+      return res.status(500).send("An error occurred while fetching transactions from the database");
+    }
+    res.json(results);
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+

@@ -6,12 +6,14 @@
     --error-color: #e74c3c;
   }
   
-  body {
-    background-color: var(--background-color);
-    color: var(--text-color);
+  .outerSavingsWallet{
+    display: flex;
+    background-image: url(assets/dashboardbg.png);
+    background-repeat: no-repeat;
+    background-position: right;
   }
-  
   .savings-wallet {
+    height: auto;
     max-width: 500px;
     margin: 20px auto;
     padding: 20px;

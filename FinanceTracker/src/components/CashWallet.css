@@ -1,0 +1,8 @@
+.CWcard{
+    height: 100px;
+    width: 200px;
+    background-color: #f7f7f7;
+    box-shadow: 0 4px 8px;
+    border-radius: 10px;
+    margin: 35px 0 0 35px;
+}
