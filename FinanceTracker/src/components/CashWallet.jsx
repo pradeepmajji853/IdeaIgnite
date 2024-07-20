@@ -18,7 +18,6 @@ export default function CashWallet() {
     setShowForm(false);
     await fetchBalance();
   };
-
   const fetchBalance = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/transactions/balance?userId=${userId}`);
@@ -27,6 +26,7 @@ export default function CashWallet() {
       console.error('Error fetching balance:', error);
     }
   };
+  
 
   useEffect(() => {
     fetchBalance();
@@ -51,3 +51,4 @@ export default function CashWallet() {
     </div>
   );
 }
+

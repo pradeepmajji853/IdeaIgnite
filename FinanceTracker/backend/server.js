@@ -99,6 +99,22 @@ app.post("/login", (req, res) => {
   });
 });
 
+app.get('/users/:userId', (req, res) => {
+  const userId = req.params.userId;
+
+  const query = 'SELECT id, first_name, last_name, email FROM users WHERE id = ?';
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching user data:", err);
+      return res.status(500).send("An error occurred while fetching user data");
+    }
+    if (results.length === 0) {
+      return res.status(404).send("User not found");
+    }
+    res.json(results[0]);
+  });
+});
+
 app.post('/savingswallet', (req, res) => {
   const { userId, type, amount, date } = req.body;
   const query = 'INSERT INTO savingswallet (user_id, type, amount, date) VALUES (?, ?, ?, ?)';
@@ -110,6 +126,21 @@ app.post('/savingswallet', (req, res) => {
     res.send('Transaction added to database');
   });
 });
+
+app.get('/savingswallet/:userId', (req, res) => {
+  const userId = req.params.userId;
+
+  const query = 'SELECT * FROM savingswallet WHERE user_id = ?';
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching transactions:", err);
+      return res.status(500).send("An error occurred while fetching transactions");
+    }
+    res.json(results);
+  });
+});
+
+
 
 app.post('/transactions', (req, res) => {
   const { userId, amount, description, category, date, type } = req.body;
@@ -144,6 +175,27 @@ app.get('/transactions', (req, res) => {
       return res.status(500).send("An error occurred while fetching transactions");
     }
     res.json(results);
+  });
+});
+
+app.get('/transactions/balance', (req, res) => {
+  const userId = req.query.userId;
+
+  const query = `
+    SELECT 
+      SUM(CASE WHEN type = 'credit' THEN amount ELSE 0 END) -
+      SUM(CASE WHEN type = 'debit' THEN amount ELSE 0 END) AS balance 
+    FROM transactions 
+    WHERE user_id = ?
+  `;
+  
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching balance:", err);
+      return res.status(500).send("An error occurred while fetching balance");
+    }
+    const balance = results[0].balance || 0; // Handle null balance
+    res.json({ balance });
   });
 });
 
@@ -183,7 +235,6 @@ app.post('/BankAccountdashboard', (req, res) => {
   });
 });
 
-// Fetch all transactions for a specific user
 app.get('/BankAccountdashboard', (req, res) => {
   const userId = req.query.userId;
 
@@ -200,7 +251,6 @@ app.get('/BankAccountdashboard', (req, res) => {
     res.json(results);
   });
 });
-
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
