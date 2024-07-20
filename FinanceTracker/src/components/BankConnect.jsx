@@ -1,45 +1,84 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import faker from "faker";
+import axios from 'axios'; 
 import './BankConnect.css';
 
 const BankConnect = () => {
-  // Function to generate fake transactions
-  const generateTransactions = (num) => {
-    const transactions = [];
-    for (let i = 0; i < num; i++) {
-      transactions.push({
-        id: faker.datatype.uuid(),
-        date: faker.date.past().toDateString(), // Convert date to readable string
-        amount: parseFloat(faker.finance.amount()),
-        description: faker.commerce.productName(),
-        category: faker.commerce.department(),
-        type: Math.random() > 0.5 ? 'Credit' : 'Debit' // Randomly assign type
-      });
-    }
-    return transactions;
-  };
-
   const [showPopup, setShowPopup] = useState(false);
   const [fakeTransactions, setFakeTransactions] = useState([]);
   const [balance, setBalance] = useState(0);
 
-  // Handler to show the popup and generate transactions
+  const generateTransactions = (num) => {
+    const transactions = [];
+    for (let i = 0; i < num; i++) {
+      const date = faker.date.past();
+      transactions.push({
+        id: faker.datatype.uuid(),
+        date: date.toISOString().split('T')[0], // Format date as YYYY-MM-DD
+        amount: parseFloat(faker.finance.amount()),
+        description: faker.commerce.productName(),
+        category: faker.commerce.department(),
+        type: Math.random() > 0.5 ? 'Credit' : 'Debit' 
+      });
+    }
+    return transactions;
+  };
+  
+
   const handleAddBankConnect = () => {
     setShowPopup(true);
   };
 
-  // Handler to close the popup and set fake transactions
-  const handlePopupClose = () => {
+  const handlePopupClose = async () => {
     setShowPopup(false);
     const transactions = generateTransactions(20);
     setFakeTransactions(transactions);
-
-    // Calculate a mock balance from transactions
+  
     const totalBalance = transactions.reduce((acc, transaction) => {
-      return transaction.type === 'Credit' ? acc + transaction.amount : acc - transaction.amount;
+      const amount = parseFloat(transaction.amount); // Ensure amount is a number
+      return transaction.type === 'Credit' ? acc + amount : acc - amount;
     }, 0);
     setBalance(totalBalance);
+  
+    const userId = localStorage.getItem('userId');
+    try {
+      const response = await axios.post('http://localhost:3000/BankAccountdashboard', {
+        userId,
+        transactions
+      });
+      console.log('Response from server:', response.data); // Debug information
+    } catch (error) {
+      console.error('Error posting fake transactions:', error.response ? error.response.data : error.message);
+    }
   };
+  
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        try {
+          const { data } = await axios.get('http://localhost:3000/BankAccountdashboard', {
+            params: { userId }
+          });
+          // Ensure that all amounts are numbers
+          const processedTransactions = data.map(transaction => ({
+            ...transaction,
+            amount: parseFloat(transaction.amount)
+          }));
+          setFakeTransactions(processedTransactions);
+          const totalBalance = processedTransactions.reduce((acc, transaction) => {
+            const amount = parseFloat(transaction.amount);
+            return transaction.type === 'Credit' ? acc + amount : acc - amount;
+          }, 0);
+          setBalance(totalBalance);
+        } catch (error) {
+          console.error('Error fetching transactions:', error.response ? error.response.data : error.message);
+        }
+      }
+    };
+    fetchTransactions();
+  }, []);
 
   return (
     <div className="bank-connect">
@@ -58,7 +97,7 @@ const BankConnect = () => {
       )}
       <div className="balance-card">
         <h3>Current Balance</h3>
-        <p>${balance.toFixed(2)}</p>
+        <p>${typeof balance === 'number' ? balance.toFixed(2) : '0.00'}</p>
       </div>
       <div className="transactions-list">
         <h3>Fake Transactions</h3>
@@ -77,7 +116,7 @@ const BankConnect = () => {
               <tr key={transaction.id}>
                 <td>{transaction.date}</td>
                 <td>{transaction.description}</td>
-                <td>${transaction.amount.toFixed(2)}</td>
+                <td>${typeof transaction.amount === 'number' ? transaction.amount.toFixed(2) : '0.00'}</td>
                 <td>{transaction.type}</td>
                 <td>{transaction.category}</td>
               </tr>

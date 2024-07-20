@@ -4,11 +4,12 @@ const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-
 const app = express();
 const port = 3000;
 const saltRounds = 10;
 const secretKey = 'Pradeep@00';
+
+const moment = require('moment');
 
 const db = mysql.createConnection({
   host: "localhost",
@@ -110,7 +111,6 @@ app.post('/savingswallet', (req, res) => {
   });
 });
 
-
 app.post('/transactions', (req, res) => {
   const { userId, amount, description, category, date, type } = req.body;
 
@@ -129,7 +129,7 @@ app.post('/transactions', (req, res) => {
   });
 });
 
-// Fetch all transactions for a user
+
 app.get('/transactions', (req, res) => {
   const userId = req.query.userId;
 
@@ -147,30 +147,61 @@ app.get('/transactions', (req, res) => {
   });
 });
 
-// Fetch current balance for a user
-app.get('/transactions/balance', (req, res) => {
+
+app.post('/BankAccountdashboard', (req, res) => {
+  const { userId, transactions } = req.body;
+
+  if (!userId || !transactions || !Array.isArray(transactions)) {
+    return res.status(400).send("Invalid input data");
+  }
+
+  for (const transaction of transactions) {
+    const { date, amount, description, category, type } = transaction;
+    if (!date || !amount || !description || !category || !type) {
+      return res.status(400).send("Transaction data is incomplete");
+    }
+  }
+
+  const query = 'INSERT INTO BAtransactions (user_id, date, amount, description, category, type) VALUES ?';
+  const values = transactions.map(t => [
+    userId,
+    moment(t.date).format('YYYY-MM-DD'), // Format date as YYYY-MM-DD
+    t.amount,
+    t.description,
+    t.category,
+    t.type
+  ]);
+
+  console.log("Inserting values:", values);
+
+  db.query(query, [values], (err) => {
+    if (err) {
+      console.error("Error inserting transactions:", err);
+      return res.status(500).send("An error occurred while inserting transactions");
+    }
+    res.send("Transactions inserted successfully");
+  });
+});
+
+// Fetch all transactions for a specific user
+app.get('/BankAccountdashboard', (req, res) => {
   const userId = req.query.userId;
 
   if (!userId) {
     return res.status(400).send("User ID is required");
   }
 
-  const query = `
-    SELECT 
-      SUM(CASE WHEN type = 'credit' THEN amount ELSE -amount END) AS balance
-    FROM transactions 
-    WHERE user_id = ?
-  `;
+  const query = 'SELECT * FROM BAtransactions WHERE user_id = ?';
   db.query(query, [userId], (err, results) => {
     if (err) {
-      console.error("Error calculating balance:", err);
-      return res.status(500).send("An error occurred while calculating balance");
+      console.error("Error fetching transactions:", err);
+      return res.status(500).send("An error occurred while fetching transactions");
     }
-    res.json({ balance: results[0].balance });
+    res.json(results);
   });
 });
 
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });
