@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./Sidebar.css";
+import LogoutButton from "./logout";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -25,6 +26,7 @@ export default function Sidebar() {
             <Link to="/savingswallet">Savings Wallet</Link>
           </li>
         </ul>
+        <LogoutButton/>
       </div>
     </div>
   );

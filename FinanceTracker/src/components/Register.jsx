@@ -5,6 +5,7 @@ import RLhead from "./RLhead";
 import { Link } from "react-router-dom";
 import "./Register.css";
 
+
 const Register = () => {
   const [message, setMessage] = useState("");
   const {
@@ -25,29 +26,32 @@ const Register = () => {
         },
         body: JSON.stringify(data),
       });
-
+  
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Network response was not ok: ${errorText}`);
       }
-
-      const result = await response.text();
-      console.log(data, result);
-
-      if (result === "Registration successful") {
+  
+      const result = await response.json();
+  
+      if (result.message === "Registration successful") {
         setMessage("Registration successful. Redirecting to dashboard...");
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("user", JSON.stringify(result.user));
+        localStorage.setItem("userId", result.user.id); 
+  
         setTimeout(() => {
           navigate("/dashboard");
         }, 2000);
       } else {
-        setError("form", { type: "manual", message: result });
+        setError("form", { type: "manual", message: result.message });
       }
     } catch (error) {
       console.error("There was an error!", error);
       setError("form", { type: "manual", message: error.message });
     }
   };
-
+  
   return (
     <>
       <RLhead />

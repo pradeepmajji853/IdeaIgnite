@@ -5,13 +5,13 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-const SWoverview = () => {
+const TransactionsGraph = ({ userId }) => {
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/transactions');
+        const response = await axios.get(`http://localhost:3000/transactions/${userId}`);
         setTransactions(response.data);
       } catch (error) {
         console.error('Error fetching transactions:', error);
@@ -19,7 +19,7 @@ const SWoverview = () => {
     };
 
     fetchTransactions();
-  }, []);
+  }, [userId]);
 
   const chartData = {
     labels: transactions.map(transaction => new Date(transaction.date).toLocaleDateString()),
@@ -42,4 +42,4 @@ const SWoverview = () => {
   );
 };
 
-export default SWoverview;
+export default TransactionsGraph;

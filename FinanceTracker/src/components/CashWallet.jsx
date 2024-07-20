@@ -1,17 +1,28 @@
-import { useState } from 'react';
-import "./CashWallet.css"
+import React, { useEffect, useState } from "react";
 
-const CashWallet = () => {
-    const [amount, setAmount] = useState(0);
-    return (
-        <div className="CashWallet">
-            <div className="CWcard">
-                <h1>Cash Wallet</h1>
-                <p>Cash</p>
-                <h3>{amount}INR</h3>
-            </div>
-        </div>
-    );
+const CashWallet = ({ user }) => {
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/savingswallet/${user.id}`);
+        const data = await response.json();
+        setTransactions(data);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+    fetchTransactions();
+  }, [user.id]);
+
+  return (
+    <div>
+      <h2>Cash Wallet</h2>
+      {/* Render transactions here */}
+    </div>
+  );
 };
 
 export default CashWallet;

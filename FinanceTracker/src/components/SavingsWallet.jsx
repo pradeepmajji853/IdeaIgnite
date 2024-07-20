@@ -1,34 +1,46 @@
-import Sidebar from "./Sidebar.jsx"
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Sidebar from './Sidebar.jsx';
 import './SavingsWallet.css';
 
 const SavingsWallet = () => {
+  const [userId, setUserId] = useState(null);
   const [balance, setBalance] = useState(0);
   const [amount, setAmount] = useState('');
   const [transactions, setTransactions] = useState([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/transactions');
-        setTransactions(response.data);
-        const initialBalance = response.data.reduce((acc, transaction) => {
-          return transaction.type === 'deposit' ? acc + transaction.amount : acc - transaction.amount;
-        }, 0);
-        setBalance(initialBalance);
-      } catch (error) {
-        console.error('Error fetching transactions:', error);
-      }
-    };
-
-    fetchTransactions();
+    const storedUserId = localStorage.getItem('userId');
+    setUserId(storedUserId);
+  
+    if (storedUserId) {
+      fetchTransactions(storedUserId);
+    }
   }, []);
+
+  const fetchTransactions = async (userId) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/savingswallet/${userId}`);
+      // Ensure amount is a number
+      const transactions = response.data.map(transaction => ({
+        ...transaction,
+        amount: Number(transaction.amount)
+      }));
+      setTransactions(transactions);
+
+      const initialBalance = transactions.reduce((acc, transaction) => {
+        return transaction.type === 'deposit' ? acc + transaction.amount : acc - transaction.amount;
+      }, 0);
+      setBalance(initialBalance);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    }
+  };
 
   const handleTransaction = async (type) => {
     const parsedAmount = parseFloat(amount);
-    
+
     if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) {
       setError('Please enter a valid positive number.');
       return;
@@ -39,11 +51,8 @@ const SavingsWallet = () => {
       return;
     }
 
-    const newBalance = type === 'deposit' 
-      ? balance + parsedAmount 
-      : balance - parsedAmount;
-    
     const newTransaction = {
+      userId,
       type,
       amount: parsedAmount,
       date: new Date().toLocaleString()
@@ -51,13 +60,18 @@ const SavingsWallet = () => {
 
     try {
       await axios.post('http://localhost:3000/savingswallet', newTransaction);
+
+      const newBalance = type === 'deposit'
+        ? balance + parsedAmount
+        : balance - parsedAmount;
+
       setBalance(newBalance);
       setTransactions([newTransaction, ...transactions]);
       setAmount('');
       setError('');
     } catch (error) {
-      console.error('Error saving transaction:', error);
-      setError('Failed to save transaction to database');
+      console.error('Error adding transaction:', error);
+      setError('Failed to add transaction');
     }
   };
 
@@ -67,7 +81,7 @@ const SavingsWallet = () => {
       <div className="savings-wallet">
         <h2>Savings Wallet</h2>
         <div className="balance">
-          <h3>Current Balance: ₹{balance.toFixed(2)}</h3>
+          <h3>Current Balance: {balance.toFixed(2)}</h3>
         </div>
         <div className="transaction">
           <input
@@ -83,9 +97,9 @@ const SavingsWallet = () => {
         <div className="transaction-history">
           <h3>Transaction History</h3>
           <ul>
-            {transactions.map((transaction, index) => (
-              <li key={index} className={transaction.type}>
-                <span>{transaction.type === 'deposit' ? '+' : '-'}₹{transaction.amount.toFixed(2)}</span>
+            {transactions.map(transaction => (
+              <li key={transaction.id} className={transaction.type}>
+                <span>{transaction.type === 'deposit' ? '+' : '-'}{isNaN(transaction.amount) ? '0.00' : transaction.amount.toFixed(2)}</span>
                 <span>{transaction.date}</span>
               </li>
             ))}

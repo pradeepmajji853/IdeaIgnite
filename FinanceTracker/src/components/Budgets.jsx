@@ -1,12 +1,6 @@
 import Sidebar from "./Sidebar.jsx"
 import "./Budgets.css"
-//export default function Budgets(){
-  //return(
-      //<div className="Budgets">
-           //<Sidebar/>
-    // </div>
-  //)
-//}
+
 
 
 
@@ -14,6 +8,7 @@ import React, { useState } from 'react';
 
 
 const BudgetForm = () => {
+  const userId = localStorage.getItem('userId');
   const [budgetName, setBudgetName] = useState('');
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('USD');
@@ -27,6 +22,9 @@ const BudgetForm = () => {
   };
 
   return (
+    <>
+    {userId}
+    <Sidebar/>
     <form className="budget-form" onSubmit={handleSubmit}>
       <h2 className="form-title">Add New Budget</h2>
 
@@ -104,6 +102,7 @@ const BudgetForm = () => {
 
       <button type="submit" className="submit-button">Create a Budget</button>
     </form>
+    </>
   );
 };
 
