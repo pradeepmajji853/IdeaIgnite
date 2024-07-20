@@ -9,7 +9,8 @@ import Register from "./Register.jsx";
 import Dashboard from "./Dashboard.jsx";
 import Overview from "./Overview.jsx";
 import Budgets from "./Budgets.jsx";
-import SavingsWallet from "./SavingsWallet.jsx"
+import SavingsWallet from "./SavingsWallet.jsx";
+import BankAccountdashboard from "./BankAccountdashboard.jsx"
 
 function App() {
   return (
@@ -70,6 +71,14 @@ function App() {
           element={
             <Layout>
               <SavingsWallet/>
+            </Layout>
+          }
+        />
+         <Route
+          path="/BankAccountdashboard"
+          element={
+            <Layout>
+              <BankAccountdashboard/>
             </Layout>
           }
         />

@@ -1,28 +1,53 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
+import TransactionForm from './TransactionForm';
+import TransactionsList from './TransactionsList';
+import './CashWallet.css';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import axios from 'axios';
 
-const CashWallet = ({ user }) => {
-  const [transactions, setTransactions] = useState([]);
+export default function CashWallet() {
+  const [showForm, setShowForm] = useState(false);
+  const [CWbal, setCWbal] = useState(0);
+  const userId = localStorage.getItem('userId');
+
+  const handleAddTransactionClick = () => {
+    setShowForm(true);
+  };
+
+  const handleCloseForm = async () => {
+    setShowForm(false);
+    await fetchBalance();
+  };
+
+  const fetchBalance = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/transactions/balance?userId=${userId}`);
+      setCWbal(response.data.balance);
+    } catch (error) {
+      console.error('Error fetching balance:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/savingswallet/${user.id}`);
-        const data = await response.json();
-        setTransactions(data);
-      } catch (error) {
-        console.error("Error fetching transactions:", error);
-      }
-    };
-
-    fetchTransactions();
-  }, [user.id]);
+    fetchBalance();
+  }, []);
 
   return (
-    <div>
-      <h2>Cash Wallet</h2>
-      {/* Render transactions here */}
+    <div className="CashWallet">
+      <div className="CWcard" onClick={handleAddTransactionClick}>
+        <div className="CWicon">
+          <AccountBalanceWalletIcon />
+        </div>
+        <div className="CWcontent">
+          <h2>Cash Wallet</h2>
+          <h3>Cash</h3>
+          <h3>{CWbal} INR</h3>
+        </div>
+      </div>
+      {showForm && <TransactionForm onClose={handleCloseForm} />}
+      <div className="TL">
+        <TransactionsList userId={userId} />
+      </div>
     </div>
   );
-};
-
-export default CashWallet;
+}

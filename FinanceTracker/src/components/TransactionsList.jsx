@@ -1,32 +1,49 @@
 import React, { useEffect, useState } from "react";
+import axios from 'axios';
+import './TransactionsList.css';
 
-const TransactionsList = ({ user }) => {
+const TransactionsList = () => {
+  const userId = localStorage.getItem('userId');
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/savingswallet/${user.id}`);
-        const data = await response.json();
-        setTransactions(data);
+        const response = await axios.get(`http://localhost:3000/transactions?userId=${userId}`);
+        setTransactions(response.data);
       } catch (error) {
-        console.error("Error fetching transactions:", error);
+        console.error('Error fetching transactions:', error);
       }
     };
 
     fetchTransactions();
-  }, [user.id]);
+  }, [userId]);
 
   return (
-    <div>
-      <h2>Transactions List</h2>
-      <ul>
-        {transactions.map((transaction) => (
-          <li key={transaction.id}>
-            {transaction.type}: {transaction.amount} on {transaction.date}
-          </li>
-        ))}
-      </ul>
+    <div className="transactions-list">
+      <h2>Transactions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody>
+          {transactions.map(transaction => (
+            <tr key={transaction.id}>
+              <td>{transaction.date}</td>
+              <td>{transaction.description}</td>
+              <td>{transaction.amount}</td>
+              <td>{transaction.type}</td>
+              <td>{transaction.category}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

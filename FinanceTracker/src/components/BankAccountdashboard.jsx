@@ -2,9 +2,9 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import "./Dashboard.css";
 import Sidebar from "./Sidebar";
-import CashWallet from "./CashWallet";
+import BankConnect from "./BankConnect";
 
-export default function Dashboard() {
+export default function BankAccountdashboard() {
   const userId = localStorage.getItem("userId");
 
   return (
@@ -22,7 +22,7 @@ export default function Dashboard() {
           </ul>
         </div>
         <div className="Content">
-          <CashWallet />
+          <BankConnect/>
         </div>
       </div>
     </div>

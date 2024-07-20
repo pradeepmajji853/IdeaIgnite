@@ -110,9 +110,34 @@ app.post('/savingswallet', (req, res) => {
   });
 });
 
-app.get('/savingswallet/:userId', (req, res) => {
-  const { userId } = req.params;
-  const query = 'SELECT * FROM savingswallet WHERE user_id = ?';
+
+app.post('/transactions', (req, res) => {
+  const { userId, amount, description, category, date, type } = req.body;
+
+  if (!userId || !amount || !description || !category || !date || !type) {
+    return res.status(400).send("All fields are required");
+  }
+
+  const query = 'INSERT INTO transactions (user_id, amount, description, category, date, type) VALUES (?, ?, ?, ?, ?, ?)';
+  
+  db.query(query, [userId, amount, description, category, date, type], (err, result) => {
+    if (err) {
+      console.error("Error adding transaction:", err);
+      return res.status(500).send("An error occurred while adding transaction");
+    }
+    res.status(201).send('Transaction added successfully');
+  });
+});
+
+// Fetch all transactions for a user
+app.get('/transactions', (req, res) => {
+  const userId = req.query.userId;
+
+  if (!userId) {
+    return res.status(400).send("User ID is required");
+  }
+
+  const query = 'SELECT * FROM transactions WHERE user_id = ?';
   db.query(query, [userId], (err, results) => {
     if (err) {
       console.error("Error fetching transactions:", err);
@@ -122,36 +147,29 @@ app.get('/savingswallet/:userId', (req, res) => {
   });
 });
 
-// Route to fetch user data
-app.get('/users/:userId', (req, res) => {
-  const { userId } = req.params;
-  const query = 'SELECT * FROM users WHERE id = ?';
+// Fetch current balance for a user
+app.get('/transactions/balance', (req, res) => {
+  const userId = req.query.userId;
+
+  if (!userId) {
+    return res.status(400).send("User ID is required");
+  }
+
+  const query = `
+    SELECT 
+      SUM(CASE WHEN type = 'credit' THEN amount ELSE -amount END) AS balance
+    FROM transactions 
+    WHERE user_id = ?
+  `;
   db.query(query, [userId], (err, results) => {
     if (err) {
-      console.error("Error fetching user from database:", err);
-      return res.status(500).send("An error occurred while fetching user from database");
+      console.error("Error calculating balance:", err);
+      return res.status(500).send("An error occurred while calculating balance");
     }
-
-    if (results.length === 0) {
-      return res.status(404).send("User not found");
-    }
-
-    res.json(results[0]);
+    res.json({ balance: results[0].balance });
   });
 });
 
-app.post('/api/logout', (req, res) => {
-  // If using sessions, destroy the session
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).send('Logout failed');
-    }
-    res.clearCookie('connect.sid'); // Clear the session cookie
-    res.status(200).send('Logged out');
-  });
-
-  // If using JWT, you might just need to instruct the client to discard the token
-});
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

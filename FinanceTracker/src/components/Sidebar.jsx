@@ -13,7 +13,7 @@ export default function Sidebar() {
       </div>
       <div className="elements">
         <ul>
-          <li className={location.pathname === "/dashboard" ? "active" : ""}>
+          <li className={location.pathname === "/dashboard"|location.pathname==="/BankAccountdashboard" ? "active" : ""}>
             <Link to="/dashboard">Dashboard</Link>
           </li>
           <li className={location.pathname === "/overview" ? "active" : ""}>
