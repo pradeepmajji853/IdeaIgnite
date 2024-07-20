@@ -1,111 +1,93 @@
-import Sidebar from "./Sidebar.jsx"
-import "./Budgets.css"
+import React, { useState, useEffect } from 'react';
+import Sidebar from "./Sidebar.jsx";
+import Button from '@mui/material/Button';
+import BudgetForm from "./BudgetForm.jsx";
+import './Budgets.css';
 
+export default function Budgets() {
+  const [showForm, setShowForm] = useState(false);
+  const [budgets, setBudgets] = useState([]);
 
+  useEffect(() => {
+    const fetchBudgetDetails = async () => {
+      const userId = localStorage.getItem('userId');
+      try {
+        const response = await fetch(`http://localhost:3000/budgets/${userId}/details`);
+        const data = await response.json();
+        setBudgets(data);
+      } catch (error) {
+        console.error('Error fetching budgets:', error);
+      }
+    };
 
+    fetchBudgetDetails();
+  }, []);
 
-import React, { useState } from 'react';
-
-
-const BudgetForm = () => {
-  const userId = localStorage.getItem('userId');
-  const [budgetName, setBudgetName] = useState('');
-  const [amount, setAmount] = useState('');
-  const [currency, setCurrency] = useState('USD');
-  const [category, setCategory] = useState('All categories');
-  const [recurrence, setRecurrence] = useState('Monthly');
-  const [startDate, setStartDate] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission logic
+  const handleFormSubmit = async (newBudget) => {
+    const userId = localStorage.getItem('userId');
+    try {
+      const response = await fetch('http://localhost:3000/budgets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId, ...newBudget })
+      });
+      const data = await response.json();
+      setBudgets([...budgets, data]);
+      setShowForm(false);
+    } catch (error) {
+      console.error('Error adding budget:', error);
+    }
   };
 
   return (
-    <>
-    {userId}
-    <Sidebar/>
-    <form className="budget-form" onSubmit={handleSubmit}>
-      <h2 className="form-title">Add New Budget</h2>
-
-      <div className="form-group">
-        <label className="form-label">Budget Name</label>
-        <input
-          type="text"
-          className="form-input"
-          value={budgetName}
-          onChange={(e) => setBudgetName(e.target.value)}
-          placeholder="e.g., Food Orders"
-        />
-      </div>
-
-      <div className="form-group">
-        <label className="form-label">Amount</label>
-        <input
-          type="number"
-          className="form-input"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          placeholder="e.g., 1500"
-        />
-        <label className="form-label">Currency</label>
-        <select
-          className="form-select"
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
-        >
-          <option value="USD">United States Dollar</option>
-          <option value="EUR">Euro</option>
-          <option value="GBP">British Pound</option>
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label className="form-label">Budgeted For</label>
-        <select
-          className="form-select"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="All categories">All categories</option>
-          <option value="Food">Food</option>
-          <option value="Accommodation">Accommodation</option>
-          <option value="Tuition Fees">Tuition Fees</option>
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label className="form-label">Recurrence</label>
-        <div className="recurrence-options">
-          {['Once', 'Daily', 'Weekly', 'Biweekly', 'Monthly', 'Yearly'].map((rec) => (
-            <button
-              type="button"
-              className={`recurrence-button ${recurrence === rec ? 'active' : ''}`}
-              key={rec}
-              onClick={() => setRecurrence(rec)}
-            >
-              {rec}
-            </button>
+    <div className="outerbudgets">
+      <Sidebar />
+      <div className="Budgets">
+        <div className="BudgetCard">
+          <p>Control your expenses with our smart budgets</p>
+          <Button
+            variant="contained"
+            color="success"
+            className="AddBudgetButton"
+            onClick={() => setShowForm(true)}
+          >
+            Add Budget
+          </Button>
+        </div>
+        {showForm && (
+          <div className="modal-overlay" onClick={() => setShowForm(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <BudgetForm onFormSubmit={handleFormSubmit} />
+            </div>
+          </div>
+        )}
+        <div className="BudgetList">
+          {budgets.map((budget, index) => (
+            <div className="BudgetCard" key={index}>
+              <h3>{budget.budgetName}</h3>
+              <div className="progress-bar">
+                <div
+                  className="progress-bar-spent"
+                  style={{ width: `${(budget.spentAmount / budget.amount) * 100}%` }}
+                ></div>
+                <div
+                  className="progress-bar-remaining"
+                  style={{ width: `${(1 - budget.spentAmount / budget.amount) * 100}%` }}
+                ></div>
+              </div>
+              <p><strong>Amount:</strong> {budget.amount} {budget.currency}</p>
+              <p><strong>Spent:</strong> {budget.spentAmount} {budget.currency}</p>
+              <p><strong>Remaining:</strong> {budget.remainingAmount} {budget.currency}</p>
+              <p><strong>Category:</strong> {budget.category}</p>
+              <p><strong>Recurrence:</strong> {budget.recurrence}</p>
+              <p><strong>Start Date:</strong> {budget.startDate}</p>
+              <p><strong>End Date:</strong> {budget.endDate}</p>
+            </div>
           ))}
         </div>
       </div>
-
-      <div className="form-group">
-        <label className="form-label">Start Date</label>
-        <input
-          type="date"
-          className="form-input"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-      </div>
-
-      <button type="submit" className="submit-button">Create a Budget</button>
-    </form>
-    </>
+    </div>
   );
-};
-
-export default BudgetForm;
-
-
+}

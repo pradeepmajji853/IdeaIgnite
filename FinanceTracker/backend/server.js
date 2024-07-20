@@ -8,7 +8,6 @@ const app = express();
 const port = 3000;
 const saltRounds = 10;
 const secretKey = 'Pradeep@00';
-
 const moment = require('moment');
 
 const db = mysql.createConnection({
@@ -140,8 +139,6 @@ app.get('/savingswallet/:userId', (req, res) => {
   });
 });
 
-
-
 app.post('/transactions', (req, res) => {
   const { userId, amount, description, category, date, type } = req.body;
 
@@ -159,7 +156,6 @@ app.post('/transactions', (req, res) => {
     res.status(201).send('Transaction added successfully');
   });
 });
-
 
 app.get('/transactions', (req, res) => {
   const userId = req.query.userId;
@@ -198,7 +194,6 @@ app.get('/transactions/balance', (req, res) => {
     res.json({ balance });
   });
 });
-
 
 app.post('/BankAccountdashboard', (req, res) => {
   const { userId, transactions } = req.body;
@@ -250,6 +245,81 @@ app.get('/BankAccountdashboard', (req, res) => {
     }
     res.json(results);
   });
+});
+
+app.post('/budgets', (req, res) => {
+  const { userId, budgetName, amount, currency, category, recurrence, startDate, endDate } = req.body;
+  const query = `
+    INSERT INTO budgets (userId, budgetName, amount, currency, category, recurrence, startDate, endDate)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+  db.query(query, [userId, budgetName, amount, currency, category, recurrence, startDate, endDate], (err, result) => {
+    if (err) {
+      console.error('Error adding budget:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      res.status(201).json({ id: result.insertId, ...req.body });
+    }
+  });
+});
+
+app.get('/budgets/:userId', (req, res) => {
+  const { userId } = req.params;
+  const query = 'SELECT * FROM budgets WHERE userId = ?';
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error('Error fetching budgets:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
+
+app.get('/budgets/:userId/details', async (req, res) => {
+  const userId = req.params.userId;
+
+  const budgetQuery = 'SELECT * FROM budgets WHERE userId = ?';
+  const transactionQuery = `
+    SELECT category, SUM(amount) as spentAmount
+    FROM transactions
+    WHERE user_id = ? AND type = 'debit'
+    GROUP BY category
+  `;
+
+  try {
+    const budgets = await new Promise((resolve, reject) => {
+      db.query(budgetQuery, [userId], (err, results) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(results);
+      });
+    });
+
+    const spentAmounts = await new Promise((resolve, reject) => {
+      db.query(transactionQuery, [userId], (err, results) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(results);
+      });
+    });
+
+    const budgetDetails = budgets.map(budget => {
+      const spentAmount = spentAmounts.find(spent => spent.category === budget.category)?.spentAmount || 0;
+      return {
+        ...budget,
+        spentAmount,
+        remainingAmount: budget.amount - spentAmount
+      };
+    });
+
+    res.status(200).json(budgetDetails);
+  } catch (error) {
+    console.error('Error fetching budget details:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 app.listen(port, () => {

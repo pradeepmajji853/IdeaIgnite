@@ -62,9 +62,24 @@ export default function TransactionForm({ onClose }) {
               onChange={(e) => setCategory(e.target.value)}
             >
               <option value="">Select category</option>
-              <option value="Food">Food</option>
-              <option value="Accommodation">Accommodation</option>
-              <option value="Tuition Fees">Tuition Fees</option>
+              <option value="All categories">All categories</option>
+          <option value="Beauty">Beauty</option>
+          <option value="Bills & fees">Bills & fees</option>
+          <option value="Car">Car</option>
+          <option value="Education">Education</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Family & Personal">Family & Personal</option>
+          <option value="Food & Drink">Food & Drink</option>
+          <option value="Gifts">Gifts</option>
+          <option value="Groceries">Groceries</option>
+          <option value="Health">Health</option>
+          <option value="Home">Home</option>
+          <option value="Others">Others</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Sports & Hobbies">Sports & Hobbies</option>
+          <option value="Transport">Transport</option>
+          <option value="Travel">Travel</option>
+          <option value="Work">Work</option>
             </select>
           </div>
           <div className="form-group">
