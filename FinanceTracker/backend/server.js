@@ -322,6 +322,42 @@ app.get('/budgets/:userId/details', async (req, res) => {
   }
 });
 
+app.get('/transactions', async (req, res) => {
+  const { userId } = req.query;
+  if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+  }
+
+  try {
+      const [rows] = await db.query(
+       ` SELECT 
+                t.id AS transaction_id,
+                t.amount AS transaction_amount,
+                t.description AS transaction_description,
+                t.category AS transaction_category,
+                t.date AS transaction_date,
+                t.type AS transaction_type,
+                b.id AS batransaction_id,
+                b.amount AS batransaction_amount,
+                b.description AS batransaction_description,
+                b.category AS batransaction_category,
+                b.date AS batransaction_date,
+                b.type AS batransaction_type
+            FROM 
+                transactions t
+            LEFT JOIN 
+                batransactions b
+            ON 
+                t.user_id = b.user_id
+            WHERE 
+                t.user_id = ?;
+      `);
+      res.json(rows);
+  } catch (err) {
+      res.status(500).json({ error: 'Database error' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
