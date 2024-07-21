@@ -10,11 +10,49 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    amount DECIMAL(10,2),
+    description VARCHAR(255),
+    category VARCHAR(50),
+    date DATE,
+    type ENUM('credit', 'debit'),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+
+
 CREATE TABLE IF NOT EXISTS savingswallet (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    type VARCHAR(10) NOT NULL,
-    amount DECIMAL(10, 2) NOT NULL,
-    date VARCHAR(50) NOT NULL,
+    type ENUM('credit', 'debit'),
+    amount DECIMAL(10,2),
+    date DATE,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS BAtransactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    date DATE,
+    amount DECIMAL(10,2),
+    description VARCHAR(255),
+    category VARCHAR(50),
+    type ENUM('credit', 'debit'),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS budgets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    userId INT,
+    budgetName VARCHAR(255),
+    amount DECIMAL(10,2),
+    currency VARCHAR(10),
+    category VARCHAR(50),
+    recurrence VARCHAR(50),
+    startDate DATE,
+    endDate DATE,
+    FOREIGN KEY (userId) REFERENCES users(id)
+);
+

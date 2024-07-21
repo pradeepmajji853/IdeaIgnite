@@ -138,26 +138,7 @@ export default function Overview() {
                         </LineChart>
                     </ResponsiveContainer>
 
-                    <h2>Income and Expenses</h2>
-                    <div className="controls">
-                        <select value={period} onChange={handlePeriodChange}>
-                            <option value="day">Day</option>
-                            <option value="week">Week</option>
-                            <option value="month">Month</option>
-                        </select>
-                        <DatePicker selected={date} onChange={handleDateChange} />
-                    </div>
-                    <ResponsiveContainer width="100%" height={400}>
-                        <LineChart data={incomeExpensesData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="date" tickFormatter={formatXAxis} />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Line type="monotone" dataKey="income" stroke="#82ca9d" />
-                            <Line type="monotone" dataKey="expenses" stroke="#ff7300" />
-                        </LineChart>
-                    </ResponsiveContainer>
+                    
                 </div>
             </div>
         </div>
