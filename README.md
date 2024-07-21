@@ -1,25 +1,31 @@
-# HOW TO ACCESS THE PROJECT IN YOUR LOCAL COMPUTER
+# How to Access the Project on Your Local Computer
+## Step 1: Cloning the Repository
+First, clone the GitHub repository to your local computer using the following command:
+git clone httpslink(https://your-repository-link.git)
 
-# step1-cloning the repo
-clone the github repository in your local computer use git command ,
-git clone https link
+# Step 2: Setting Up the Frontend
+Open Visual Studio Code (VSCode).
+Open the terminal in VSCode.
+Navigate to the FinanceTracker directory by running:
+cd /path/to/FinanceTracker
+Install all frontend dependencies by running:
+npm install
+Run the frontend development server by executing:
+npm run dev
+# Step 3: Setting Up the Backend
+Open a new terminal in VSCode.
+Navigate to the backend directory by running:
+cd /path/to/backend
+Install all backend dependencies by running:
+npm install
+Run the backend server by executing:
+node server.js
+# Step 4: Setting Up the Database
+Install MySQL on your local computer if you haven't already.
+Open MySQL Workbench.
+Create a new connection in MySQL Workbench.
+Run the SQL commands provided in backend/schema.sql in the MySQL query box to create the database and required tables.
+Update your server code with the MySQL password you set while creating the connection. Ensure the configuration matches your MySQL setup.4
 
-# step2-setting up frontend
-open the terminal in the vscode , get into FinanceTracker directory you can use 
-cd /path to achieve this 
-then run npm install to download all frontend dependencies
- npm run dev ,to run the frontend
-
-# step3-setting up backend
-now open a new terminal and get into backend directory you can use
-cd /path to achieve this 
-then run npm install to download all backend dependencies
-node server.js ,to run the backend
-
-# step4-setting up databases 
-install mysql in your local computer 
-open the mysql workbench and create a new connecion 
-run the commands given in backend/schema.sql in your query box to create the database and required tables 
-now update your server code with the password -set by you while creating the connection
-
-# your app is all set to run in browser
+Your App is All Set to Run in the Browser
+Once you have completed these steps, your application should be up and running in the browser. You can access it by navigating to http://localhost:5173 
