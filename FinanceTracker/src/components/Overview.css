@@ -1,27 +1,24 @@
-.chart-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-}
-
 .Overview {
     display: flex;
-    flex-direction: row;
+}
+
+.sidebar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 250px; /* Sidebar width */
+    background-color: #f8f9fa; /* Background color for the sidebar */
+    z-index: 1000; /* Ensure the sidebar is on top of other elements */
+ overflow-y: hidden;
+}
+
+.content-container {
+    margin-left: 250px; /* Adjust margin to match the sidebar width */
     padding: 20px;
+    width: calc(100% - 250px); /* Adjust width to fit the remaining space */
 }
 
-h2 {
-    margin-bottom: 20px;
-}
-
-.custom-legend {
-    margin-left: 20px;
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
-}
-
-.custom-legend div {
-    margin-bottom: 8px;
+.chart-container {
+    width: 100%;
 }

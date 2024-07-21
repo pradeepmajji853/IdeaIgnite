@@ -383,6 +383,52 @@ app.get('/balance-over-time', async (req, res) => {
   }
 });
 
+// Endpoint to fetch income and expenses for a specific period
+app.get('/income-expenses', async (req, res) => {
+  const { userId, period, date } = req.query;
+  if (!userId || !period || !date) {
+    return res.status(400).json({ error: 'User ID, period, and date are required' });
+  }
+
+  let startDate;
+  let endDate;
+
+  switch (period) {
+    case 'day':
+      startDate = moment(date).startOf('day').format('YYYY-MM-DD');
+      endDate = moment(date).endOf('day').format('YYYY-MM-DD');
+      break;
+    case 'week':
+      startDate = moment(date).startOf('week').format('YYYY-MM-DD');
+      endDate = moment(date).endOf('week').format('YYYY-MM-DD');
+      break;
+    case 'month':
+      startDate = moment(date).startOf('month').format('YYYY-MM-DD');
+      endDate = moment(date).endOf('month').format('YYYY-MM-DD');
+      break;
+    default:
+      return res.status(400).json({ error: 'Invalid period' });
+  }
+
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        DATE(date) as date,
+        SUM(CASE WHEN type = 'credit' THEN amount ELSE 0 END) as income,
+        SUM(CASE WHEN type = 'debit' THEN amount ELSE 0 END) as expenses
+      FROM transactions
+      WHERE user_id = ? AND date BETWEEN ? AND ?
+      GROUP BY DATE(date)
+      ORDER BY DATE(date);
+    `, [userId, startDate, endDate]);
+
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

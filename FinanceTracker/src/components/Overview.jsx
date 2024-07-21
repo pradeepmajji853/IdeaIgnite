@@ -3,10 +3,15 @@ import axios from 'axios';
 import { PieChart, Pie, Cell, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import Sidebar from "./Sidebar.jsx";
 import "./Overview.css";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default function Overview() {
     const [transactions, setTransactions] = useState([]);
     const [balanceData, setBalanceData] = useState([]);
+    const [incomeExpensesData, setIncomeExpensesData] = useState([]);
+    const [period, setPeriod] = useState('day');
+    const [date, setDate] = useState(new Date());
     const userId = localStorage.getItem('userId');
 
     useEffect(() => {
@@ -27,7 +32,28 @@ export default function Overview() {
             .catch(error => {
                 console.error("There was an error fetching the balance data!", error);
             });
-    }, [userId]);
+
+        // Fetch income and expenses data
+        fetchIncomeExpensesData(period, date);
+    }, [userId, period, date]);
+
+    const fetchIncomeExpensesData = (period, date) => {
+        axios.get(`http://localhost:3000/income-expenses?userId=${userId}&period=${period}&date=${date.toISOString().split('T')[0]}`)
+            .then(response => {
+                setIncomeExpensesData(response.data);
+            })
+            .catch(error => {
+                console.error("There was an error fetching the income and expenses data!", error);
+            });
+    };
+
+    const handlePeriodChange = (event) => {
+        setPeriod(event.target.value);
+    };
+
+    const handleDateChange = (date) => {
+        setDate(date);
+    };
 
     // Process transactions to get data for the pie chart
     const categoryData = transactions.reduce((acc, transaction) => {
@@ -54,61 +80,87 @@ export default function Overview() {
 
     return (
         <div className="Overview">
-            <Sidebar />
-            <div className="chart-container">
-                <h2>Spending by Category</h2>
-                <PieChart width={600} height={400}>
-                    <Pie
-                        data={pieChartData}
-                        cx={300}
-                        cy={200}
-                        outerRadius={150}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={false}  // Disable labels inside pie slices
-                    >
-                        {pieChartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                    </Pie>
-                    <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
-                    <Legend
-                        layout="vertical"
-                        align="right"
-                        verticalAlign="middle"
-                        content={({ payload }) => (
-                            <div className="custom-legend">
-                                {payload.map((entry, index) => (
-                                    <div key={`item-${index}`} style={{ color: entry.payload.fill }}>
-                                        {entry.payload.name}: {entry.payload.percent.toFixed(0)}%
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    />
-                </PieChart>
-
-                <h2>Balance Over Time</h2>
-                <ResponsiveContainer width="100%" height={400}>
-                    <LineChart
-                        data={balanceData}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" tickFormatter={formatXAxis} />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line
-                            type="monotone"
-                            dataKey="balance"
-                            stroke="#8884d8"
-                            activeDot={{ r: 8 }}
-                            animationDuration={1000}  // Duration of the animation
+            <div className="sidebar-container">
+                <Sidebar />
+            </div>
+            <div className="content-container">
+                <div className="chart-container">
+                    <h2>Spending by Category</h2>
+                    <PieChart width={600} height={400}>
+                        <Pie
+                            data={pieChartData}
+                            cx={300}
+                            cy={200}
+                            outerRadius={150}
+                            fill="#8884d8"
+                            dataKey="value"
+                            label={false}  // Disable labels inside pie slices
+                        >
+                            {pieChartData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                        </Pie>
+                        <Tooltip formatter={(value) => `₹${value.toFixed(2)}`} />
+                        <Legend
+                            layout="vertical"
+                            align="right"
+                            verticalAlign="middle"
+                            content={({ payload }) => (
+                                <div className="custom-legend">
+                                    {payload.map((entry, index) => (
+                                        <div key={`item-${index}`} style={{ color: entry.payload.fill }}>
+                                            {entry.payload.name}: {entry.payload.percent.toFixed(0)}%
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         />
-                    </LineChart>
-                </ResponsiveContainer>
+                    </PieChart>
+
+                    <h2>Balance Over Time</h2>
+                    <ResponsiveContainer width="100%" height={400}>
+                        <LineChart
+                            data={balanceData}
+                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                        >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="date" tickFormatter={formatXAxis} />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Line
+                                type="monotone"
+                                dataKey="balance"
+                                stroke="#8884d8"
+                                activeDot={{ r: 8 }}
+                                animationDuration={1000}  // Duration of the animation
+                            />
+                        </LineChart>
+                    </ResponsiveContainer>
+
+                    <h2>Income and Expenses</h2>
+                    <div className="controls">
+                        <select value={period} onChange={handlePeriodChange}>
+                            <option value="day">Day</option>
+                            <option value="week">Week</option>
+                            <option value="month">Month</option>
+                        </select>
+                        <DatePicker selected={date} onChange={handleDateChange} />
+                    </div>
+                    <ResponsiveContainer width="100%" height={400}>
+                        <LineChart data={incomeExpensesData}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="date" tickFormatter={formatXAxis} />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Line type="monotone" dataKey="income" stroke="#82ca9d" />
+                            <Line type="monotone" dataKey="expenses" stroke="#ff7300" />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
             </div>
         </div>
     );
 }
+

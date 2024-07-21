@@ -41,7 +41,7 @@ export default function CashWallet() {
         <div className="CWcontent">
           <h2>Cash Wallet</h2>
           <h3>Cash</h3>
-          <h3>{CWbal} INR</h3>
+          <h3>₹{CWbal}</h3>
         </div>
       </div>
       {showForm && <TransactionForm onClose={handleCloseForm} />}

@@ -81,7 +81,7 @@ const SavingsWallet = () => {
       <div className="savings-wallet">
         <h2>Savings Wallet</h2>
         <div className="balance">
-          <h3>Current Balance: {balance.toFixed(2)}</h3>
+          <h3>Current Balance:₹ {balance.toFixed(2)}</h3>
         </div>
         <div className="transaction">
           <input

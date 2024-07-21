@@ -37,7 +37,7 @@ const TransactionsList = () => {
             <tr key={transaction.id}>
               <td>{transaction.date}</td>
               <td>{transaction.description}</td>
-              <td>{transaction.amount}</td>
+              <td>₹{transaction.amount}</td>
               <td>{transaction.type}</td>
               <td>{transaction.category}</td>
             </tr>
