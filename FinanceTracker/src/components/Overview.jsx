@@ -15,7 +15,6 @@ export default function Overview() {
     const userId = localStorage.getItem('userId');
 
     useEffect(() => {
-        // Fetch transactions from the API
         axios.get(`http://localhost:3000/transactions?userId=${userId}`)
             .then(response => {
                 setTransactions(response.data);
@@ -24,7 +23,6 @@ export default function Overview() {
                 console.error("There was an error fetching the transactions!", error);
             });
 
-        // Fetch balance data over time
         axios.get(`http://localhost:3000/balance-over-time?userId=${userId}`)
             .then(response => {
                 setBalanceData(response.data);
@@ -33,7 +31,7 @@ export default function Overview() {
                 console.error("There was an error fetching the balance data!", error);
             });
 
-        // Fetch income and expenses data
+    
         fetchIncomeExpensesData(period, date);
     }, [userId, period, date]);
 
@@ -55,7 +53,7 @@ export default function Overview() {
         setDate(date);
     };
 
-    // Process transactions to get data for the pie chart
+  
     const categoryData = transactions.reduce((acc, transaction) => {
         const { category, amount } = transaction;
         if (!acc[category]) {

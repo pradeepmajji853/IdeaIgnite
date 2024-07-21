@@ -1,11 +1,11 @@
-/* Ensure the form takes up more width */
+
 .budget-form {
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
     width: 100%;
-    max-width: 400px; /* Adjust this value to your preference */
+    max-width: 400px; 
     margin: 0 auto;
   }
   
@@ -75,8 +75,7 @@
   .submit-button:hover {
     background-color: #218838;
   }
-  
-  /* Modal overlay styling */
+
   .modal-overlay {
     position: fixed;
     top: 0;
@@ -90,13 +89,13 @@
     z-index: 1000;
   }
   
-  /* Centering the modal content */
+
   .modal-content {
     background-color: white;
     padding: 20px;
     border-radius: 10px;
-    max-width: 500px; /* Adjust this value to your preference */
-    width: 90%; /* Adjust this value to your preference */
+    max-width: 500px; 
+    width: 90%; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 1001;
   }

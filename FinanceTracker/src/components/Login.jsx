@@ -27,11 +27,11 @@ const Login = () => {
 
       let result;
 
-      // Check if response is JSON
+    
       try {
         result = await response.json();
       } catch (error) {
-        // If JSON parsing fails, read the response as text
+       
         const text = await response.text();
         console.error("Response is not JSON:", text);
         setError("form", { type: "manual", message: "An error occurred: " + text });
@@ -41,31 +41,31 @@ const Login = () => {
       if (response.ok) {
         setMessage("Login successful. Redirecting to dashboard...");
 
-        // Save token and decode it to get userId
+      
         localStorage.setItem("token", result.token);
         const decodedToken = jwtDecode(result.token);
         const userId = decodedToken.userId;
 
-        localStorage.setItem("userId", userId); // Save userId in localStorage
+        localStorage.setItem("userId", userId); 
 
-        // Fetch user data from backend
+        
         try {
           const userResponse = await fetch(`http://localhost:3000/users/${userId}`);
           if (!userResponse.ok) {
             throw new Error("User data fetch failed");
           }
           const userData = await userResponse.json();
-          localStorage.setItem("user", JSON.stringify(userData)); // Save user data
+          localStorage.setItem("user", JSON.stringify(userData)); 
         } catch (userError) {
           console.error("Error fetching user data:", userError);
           setError("form", { type: "manual", message: "An error occurred while fetching user data" });
           return;
         }
 
-        // Clear sessionStorage
+        
         sessionStorage.clear();
 
-        // Redirect to dashboard
+      
         navigate("/dashboard");
       } else {
         setError("form", { type: "manual", message: result.message || "Login failed" });

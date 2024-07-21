@@ -14,7 +14,7 @@ const BankConnect = () => {
       const date = faker.date.past();
       transactions.push({
         id: faker.datatype.uuid(),
-        date: date.toISOString().split('T')[0], // Format date as YYYY-MM-DD
+        date: date.toISOString().split('T')[0], 
         amount: parseFloat(faker.finance.amount()),
         description: faker.commerce.productName(),
         category: faker.commerce.department(),
@@ -35,7 +35,7 @@ const BankConnect = () => {
     setFakeTransactions(transactions);
   
     const totalBalance = transactions.reduce((acc, transaction) => {
-      const amount = parseFloat(transaction.amount); // Ensure amount is a number
+      const amount = parseFloat(transaction.amount); 
       return transaction.type === 'Credit' ? acc + amount : acc - amount;
     }, 0);
     setBalance(totalBalance);
@@ -46,7 +46,7 @@ const BankConnect = () => {
         userId,
         transactions
       });
-      console.log('Response from server:', response.data); // Debug information
+      console.log('Response from server:', response.data);
     } catch (error) {
       console.error('Error posting fake transactions:', error.response ? error.response.data : error.message);
     }
@@ -61,7 +61,7 @@ const BankConnect = () => {
           const { data } = await axios.get('http://localhost:3000/BankAccountdashboard', {
             params: { userId }
           });
-          // Ensure that all amounts are numbers
+        
           const processedTransactions = data.map(transaction => ({
             ...transaction,
             amount: parseFloat(transaction.amount)

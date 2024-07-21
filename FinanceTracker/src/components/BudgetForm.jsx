@@ -75,7 +75,6 @@ export default function BudgetForm({ onFormSubmit }) {
         >
           <option value="USD">USD</option>
           <option value="INR">INR</option>
-          {/* Add more currencies as needed */}
         </select>
       </div>
       <div className="form-group">

@@ -22,7 +22,7 @@ const SavingsWallet = () => {
   const fetchTransactions = async (userId) => {
     try {
       const response = await axios.get(`http://localhost:3000/savingswallet/${userId}`);
-      // Ensure amount is a number
+  
       const transactions = response.data.map(transaction => ({
         ...transaction,
         amount: Number(transaction.amount)

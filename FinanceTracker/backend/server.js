@@ -190,7 +190,7 @@ app.get('/transactions/balance', (req, res) => {
       console.error("Error fetching balance:", err);
       return res.status(500).send("An error occurred while fetching balance");
     }
-    const balance = results[0].balance || 0; // Handle null balance
+    const balance = results[0].balance || 0; 
     res.json({ balance });
   });
 });
@@ -212,7 +212,7 @@ app.post('/BankAccountdashboard', (req, res) => {
   const query = 'INSERT INTO BAtransactions (user_id, date, amount, description, category, type) VALUES ?';
   const values = transactions.map(t => [
     userId,
-    moment(t.date).format('YYYY-MM-DD'), // Format date as YYYY-MM-DD
+    moment(t.date).format('YYYY-MM-DD'), 
     t.amount,
     t.description,
     t.category,
@@ -358,7 +358,6 @@ app.get('/transactions', async (req, res) => {
   }
 });
 
-// Route to get balance over time for a specific user
 app.get('/balance-over-time', async (req, res) => {
   const { userId } = req.query;
   if (!userId) {
@@ -383,7 +382,7 @@ app.get('/balance-over-time', async (req, res) => {
   }
 });
 
-// Endpoint to fetch income and expenses for a specific period
+
 app.get('/income-expenses', async (req, res) => {
   const { userId, period, date } = req.query;
   if (!userId || !period || !date) {

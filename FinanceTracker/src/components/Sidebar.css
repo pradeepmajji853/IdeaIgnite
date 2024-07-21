@@ -3,14 +3,14 @@
 .Sidebar {
   width: 250px;
   height: 100vh;
-  background-color: #f9f9f9; /* Light background color */
-  color: #333; /* Dark text color */
+  background-color: #f9f9f9; 
+  color: #333; 
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
   font-family: 'Roboto', sans-serif;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Light shadow for some depth */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .title {
@@ -20,7 +20,7 @@
 .title h1 {
   font-size: 24px;
   font-weight: 700;
-  color: #333; /* Dark text color */
+  color: #333; 
 }
 
 .elements {
@@ -40,7 +40,7 @@
 
 .elements li a {
   text-decoration: none;
-  color: #333; /* Dark text color */
+  color: #333; 
   font-size: 18px;
   font-weight: 400;
   display: block;
@@ -51,12 +51,12 @@
 }
 
 .elements li a:hover {
-  background-color: #e0e0e0; /* Light hover background color */
+  background-color: #e0e0e0; 
 }
 
 .elements li.active a {
-  background-color: green; /* Highlight color for active link */
-  color: white; /* Text color for active link */
+  background-color: green; 
+  color: white; 
 }
 
 
