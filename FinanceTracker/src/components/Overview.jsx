@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { PieChart, Pie, Tooltip, Cell, Legend } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import Sidebar from "./Sidebar.jsx";
 import "./Overview.css";
 
 export default function Overview() {
     const [transactions, setTransactions] = useState([]);
+    const [balanceData, setBalanceData] = useState([]);
     const userId = localStorage.getItem('userId');
 
     useEffect(() => {
@@ -16,6 +17,15 @@ export default function Overview() {
             })
             .catch(error => {
                 console.error("There was an error fetching the transactions!", error);
+            });
+
+        // Fetch balance data over time
+        axios.get(`http://localhost:3000/balance-over-time?userId=${userId}`)
+            .then(response => {
+                setBalanceData(response.data);
+            })
+            .catch(error => {
+                console.error("There was an error fetching the balance data!", error);
             });
     }, [userId]);
 
@@ -36,6 +46,11 @@ export default function Overview() {
     }));
 
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'];
+
+    const formatXAxis = (tickItem) => {
+        const date = new Date(tickItem);
+        return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    };
 
     return (
         <div className="Overview">
@@ -72,8 +87,28 @@ export default function Overview() {
                         )}
                     />
                 </PieChart>
+
+                <h2>Balance Over Time</h2>
+                <ResponsiveContainer width="100%" height={400}>
+                    <LineChart
+                        data={balanceData}
+                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" tickFormatter={formatXAxis} />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line
+                            type="monotone"
+                            dataKey="balance"
+                            stroke="#8884d8"
+                            activeDot={{ r: 8 }}
+                            animationDuration={1000}  // Duration of the animation
+                        />
+                    </LineChart>
+                </ResponsiveContainer>
             </div>
         </div>
     );
 }
-

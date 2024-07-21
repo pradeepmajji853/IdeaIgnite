@@ -31,7 +31,7 @@ const BankConnect = () => {
 
   const handlePopupClose = async () => {
     setShowPopup(false);
-    const transactions = generateTransactions(20);
+    const transactions = generateTransactions(10);
     setFakeTransactions(transactions);
   
     const totalBalance = transactions.reduce((acc, transaction) => {
@@ -97,7 +97,7 @@ const BankConnect = () => {
       )}
       <div className="balance-card">
         <h3>Current Balance</h3>
-        <p>${typeof balance === 'number' ? balance.toFixed(2) : '0.00'}</p>
+        <p>₹{typeof balance === 'number' ? balance.toFixed(2) : '0.00'}</p>
       </div>
       <div className="transactions-list">
         <h3>Fake Transactions</h3>
@@ -116,7 +116,7 @@ const BankConnect = () => {
               <tr key={transaction.id}>
                 <td>{transaction.date}</td>
                 <td>{transaction.description}</td>
-                <td>${typeof transaction.amount === 'number' ? transaction.amount.toFixed(2) : '0.00'}</td>
+                <td>₹{typeof transaction.amount === 'number' ? transaction.amount.toFixed(2) : '0.00'}</td>
                 <td>{transaction.type}</td>
                 <td>{transaction.category}</td>
               </tr>

@@ -358,6 +358,32 @@ app.get('/transactions', async (req, res) => {
   }
 });
 
+// Route to get balance over time for a specific user
+app.get('/balance-over-time', async (req, res) => {
+  const { userId } = req.query;
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID is required' });
+  }
+
+  try {
+    const [rows] = await db.promise().query(`
+      SELECT
+        DATE(date) AS date,
+        SUM(CASE WHEN type = 'credit' THEN amount ELSE -amount END) AS balance
+      FROM transactions
+      WHERE user_id = ?
+      GROUP BY DATE(date)
+      ORDER BY DATE(date);
+    `, [userId]);
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching balance over time:", err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
