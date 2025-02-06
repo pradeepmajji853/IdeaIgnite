@@ -5,8 +5,6 @@ import Sidebar from "./Sidebar";
 import CashWallet from "./CashWallet";
 
 export default function Dashboard() {
-  const userId = localStorage.getItem("userId");
-
   return (
     <div className="Dashboard">
       <Sidebar />
@@ -14,10 +12,20 @@ export default function Dashboard() {
         <div className="DashboardNav">
           <ul>
             <li>
-              <NavLink to="/dashboard" activeClassName="active">CASH WALLETS</NavLink>
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                CASH WALLETS
+              </NavLink>
             </li>
             <li>
-              <NavLink to="/BankAccountdashboard" activeClassName="active">BANK ACCOUNTS</NavLink>
+              <NavLink
+                to="/bankaccountdashboard"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                BANK ACCOUNTS
+              </NavLink>
             </li>
           </ul>
         </div>
