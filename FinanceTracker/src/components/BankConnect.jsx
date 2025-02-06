@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import faker from "faker";
-import axios from 'axios'; 
 import './BankConnect.css';
 
 const BankConnect = () => {
@@ -23,61 +22,40 @@ const BankConnect = () => {
     }
     return transactions;
   };
-  
 
   const handleAddBankConnect = () => {
     setShowPopup(true);
   };
 
-  const handlePopupClose = async () => {
+  const handlePopupClose = () => {
     setShowPopup(false);
     const transactions = generateTransactions(10);
     setFakeTransactions(transactions);
-  
+
     const totalBalance = transactions.reduce((acc, transaction) => {
       const amount = parseFloat(transaction.amount); 
       return transaction.type === 'Credit' ? acc + amount : acc - amount;
     }, 0);
     setBalance(totalBalance);
-  
-    const userId = localStorage.getItem('userId');
-    try {
-      const response = await axios.post('http://localhost:3000/BankAccountdashboard', {
-        userId,
-        transactions
-      });
-      console.log('Response from server:', response.data);
-    } catch (error) {
-      console.error('Error posting fake transactions:', error.response ? error.response.data : error.message);
-    }
+
+    // Retrieve the existing transactions from localStorage and add the new ones
+    const storedTransactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    const updatedTransactions = [...storedTransactions, ...transactions];
+
+    // Store the updated transactions back in localStorage
+    localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
   };
-  
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        try {
-          const { data } = await axios.get('http://localhost:3000/BankAccountdashboard', {
-            params: { userId }
-          });
-        
-          const processedTransactions = data.map(transaction => ({
-            ...transaction,
-            amount: parseFloat(transaction.amount)
-          }));
-          setFakeTransactions(processedTransactions);
-          const totalBalance = processedTransactions.reduce((acc, transaction) => {
-            const amount = parseFloat(transaction.amount);
-            return transaction.type === 'Credit' ? acc + amount : acc - amount;
-          }, 0);
-          setBalance(totalBalance);
-        } catch (error) {
-          console.error('Error fetching transactions:', error.response ? error.response.data : error.message);
-        }
-      }
-    };
-    fetchTransactions();
+    // Retrieve transactions from localStorage on initial load
+    const storedTransactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    setFakeTransactions(storedTransactions);
+
+    const totalBalance = storedTransactions.reduce((acc, transaction) => {
+      const amount = parseFloat(transaction.amount);
+      return transaction.type === 'Credit' ? acc + amount : acc - amount;
+    }, 0);
+    setBalance(totalBalance);
   }, []);
 
   return (

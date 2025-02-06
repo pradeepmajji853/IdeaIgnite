@@ -9,36 +9,32 @@ export default function Budgets() {
   const [budgets, setBudgets] = useState([]);
 
   useEffect(() => {
-    const fetchBudgetDetails = async () => {
-      const userId = localStorage.getItem('userId');
-      try {
-        const response = await fetch(`http://localhost:3000/budgets/${userId}/details`);
-        const data = await response.json();
-        setBudgets(data);
-      } catch (error) {
-        console.error('Error fetching budgets:', error);
-      }
-    };
-
-    fetchBudgetDetails();
+    // Load budgets from local storage
+    const storedBudgets = JSON.parse(localStorage.getItem('budgets')) || [];
+    setBudgets(storedBudgets);
   }, []);
 
-  const handleFormSubmit = async (newBudget) => {
-    const userId = localStorage.getItem('userId');
-    try {
-      const response = await fetch('http://localhost:3000/budgets', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ userId, ...newBudget })
-      });
-      const data = await response.json();
-      setBudgets([...budgets, data]);
-      setShowForm(false);
-    } catch (error) {
-      console.error('Error adding budget:', error);
-    }
+  const handleFormSubmit = (newBudget) => {
+    // Save the new budget to localStorage
+    const updatedBudgets = [...budgets, newBudget];
+    localStorage.setItem('budgets', JSON.stringify(updatedBudgets));
+    setBudgets(updatedBudgets);
+    setShowForm(false);
+  };
+
+  // Get transactions from localStorage
+  const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+  // Function to calculate spent & remaining for each budget
+  const calculateBudgetDetails = (budget) => {
+    const categoryTransactions = transactions.filter(
+      (t) => t.category === budget.category && t.type === "debit"
+    );
+
+    const spentAmount = categoryTransactions.reduce((acc, t) => acc + t.amount, 0);
+    const remainingAmount = budget.amount - spentAmount;
+
+    return { spentAmount, remainingAmount };
   };
 
   return (
@@ -56,6 +52,7 @@ export default function Budgets() {
             Add Budget
           </Button>
         </div>
+
         {showForm && (
           <div className="modal-overlay" onClick={() => setShowForm(false)}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -63,31 +60,36 @@ export default function Budgets() {
             </div>
           </div>
         )}
+
         <div className="BudgetList">
-          {budgets.map((budget, index) => (
-            <div className="BudgetCard" key={index}>
-              <h3>{budget.budgetName}</h3>
-              <div className="progress-bar">
-                <div
-                  className="progress-bar-spent"
-                  style={{ width: `${(budget.spentAmount / budget.amount) * 100}%` }}
-                ></div>
-                <div
-                  className="progress-bar-remaining"
-                  style={{ width: `${(1 - budget.spentAmount / budget.amount) * 100}%` }}
-                ></div>
+          {budgets.map((budget, index) => {
+            const { spentAmount, remainingAmount } = calculateBudgetDetails(budget);
+            return (
+              <div className="BudgetCard" key={index}>
+                <h3>{budget.budgetName}</h3>
+                <div className="progress-bar">
+                  <div
+                    className="progress-bar-spent"
+                    style={{ width: `${(spentAmount / budget.amount) * 100}%` }}
+                  ></div>
+                  <div
+                    className="progress-bar-remaining"
+                    style={{ width: `${(remainingAmount / budget.amount) * 100}%` }}
+                  ></div>
+                </div>
+                <p><strong>Amount:</strong> {budget.amount} {budget.currency}</p>
+                <p><strong>Spent:</strong> {spentAmount} {budget.currency}</p>
+                <p><strong>Remaining:</strong> {remainingAmount} {budget.currency}</p>
+                <p><strong>Category:</strong> {budget.category}</p>
+                <p><strong>Recurrence:</strong> {budget.recurrence}</p>
+                <p><strong>Start Date:</strong> {budget.startDate}</p>
+                <p><strong>End Date:</strong> {budget.endDate}</p>
               </div>
-              <p><strong>Amount:</strong> {budget.amount} {budget.currency}</p>
-              <p><strong>Spent:</strong> {budget.spentAmount} {budget.currency}</p>
-              <p><strong>Remaining:</strong> {budget.remainingAmount} {budget.currency}</p>
-              <p><strong>Category:</strong> {budget.category}</p>
-              <p><strong>Recurrence:</strong> {budget.recurrence}</p>
-              <p><strong>Start Date:</strong> {budget.startDate}</p>
-              <p><strong>End Date:</strong> {budget.endDate}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
   );
 }
+

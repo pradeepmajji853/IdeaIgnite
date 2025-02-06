@@ -1,111 +1,91 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import './TransactionForm.css';
 
-export default function TransactionForm({ onClose }) {
+export default function TransactionForm({ onClose, saveTransaction }) {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
-  const [date, setDate] = useState('');
-  const [type, setType] = useState('');
-  const userId = localStorage.getItem('userId');
+  const [transactionType, setTransactionType] = useState('credit'); // Default is 'credit'
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Default to today's date
 
-  const handleSubmit = async (e) => {
+  const categories = ['Fees', 'Rent', 'Beauty', 'Groceries', 'Entertainment', 'Travel'];
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    try {
-      await axios.post('http://localhost:3000/transactions', {
-        userId,
-        amount,
-        description,
-        category,
-        date,
-        type
-      });
-      onClose();
-    } catch (error) {
-      console.error('Error adding transaction:', error);
-    }
+    const newTransaction = {
+      id: new Date().getTime(),
+      amount: parseFloat(amount),
+      description,
+      category,
+      transactionType,
+      date, // Add the date field
+    };
+
+    saveTransaction(newTransaction);
+    onClose();
   };
 
   return (
-    <div className="TransactionForm">
-      <div className="overlay" onClick={onClose}></div>
-      <div className="form-container">
-        <h2>Add Transaction</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">Amount</label>
-            <input
-              type="number"
-              className="form-input"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="Amount"
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Description</label>
-            <input
-              type="text"
-              className="form-input"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add description"
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Category</label>
-            <select
-              className="form-select"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <option value="">Select category</option>
-              <option value="All categories">All categories</option>
-          <option value="Beauty">Beauty</option>
-          <option value="Bills & fees">Bills & fees</option>
-          <option value="Car">Car</option>
-          <option value="Education">Education</option>
-          <option value="Entertainment">Entertainment</option>
-          <option value="Family & Personal">Family & Personal</option>
-          <option value="Food & Drink">Food & Drink</option>
-          <option value="Gifts">Gifts</option>
-          <option value="Groceries">Groceries</option>
-          <option value="Health">Health</option>
-          <option value="Home">Home</option>
-          <option value="Others">Others</option>
-          <option value="Shopping">Shopping</option>
-          <option value="Sports & Hobbies">Sports & Hobbies</option>
-          <option value="Transport">Transport</option>
-          <option value="Travel">Travel</option>
-          <option value="Work">Work</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label className="form-label">Date</label>
-            <input
-              type="date"
-              className="form-input"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Type</label>
-            <select
-              className="form-select"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-            >
-              <option value="">Select type</option>
-              <option value="credit">Credit</option>
-              <option value="debit">Debit</option>
-            </select>
-          </div>
-          <button type="submit">Add Transaction</button>
-        </form>
-      </div>
+    <div className="transaction-form">
+      <h2>Add Transaction</h2>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Date:
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Amount:
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            required
+            min="1"
+          />
+        </label>
+        <label>
+          Description:
+          <input
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Category:
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+          >
+            <option value="">Select Category</option>
+            {categories.map((cat, index) => (
+              <option key={index} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Type:
+          <select
+            value={transactionType}
+            onChange={(e) => setTransactionType(e.target.value)}
+            required
+          >
+            <option value="credit">Credit</option>
+            <option value="debit">Debit</option>
+          </select>
+        </label>
+        <button type="submit">Add Transaction</button>
+      </form>
+      <button className="close-btn" onClick={onClose}>Close</button>
     </div>
   );
 }

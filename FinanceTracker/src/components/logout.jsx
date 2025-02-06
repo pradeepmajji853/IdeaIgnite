@@ -1,29 +1,25 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { useClerk } from "@clerk/clerk-react";
+import "./Logout.css"; // Import external CSS file
 
-function LogoutButton() {
+function Logout() {
   const navigate = useNavigate();
+  const { signOut } = useClerk(); // Get signOut function from Clerk
 
-  const handleLogout = () => {
-  
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('userId');
-
-
-    sessionStorage.clear();
-
-    fetch('/api/logout', {
-      method: 'POST',
-      credentials: 'include', 
-    }).then(() => {
-    
-      navigate('/');
-    }).catch(error => {
-      console.error('Logout failed:', error);
-    });
+  const handleLogout = async () => {
+    try {
+      await signOut(); // Clerk handles session removal
+      navigate("/"); // Redirect to homepage
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
-  return <button onClick={handleLogout}>Logout</button>;
+  return (
+    <button onClick={handleLogout} className="logout-button">
+      Logout
+    </button>
+  );
 }
 
-export default LogoutButton;
+export default Logout;

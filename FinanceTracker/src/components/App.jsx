@@ -4,13 +4,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Features from "./Features.jsx";
 import Getstarted from "./Getstarted.jsx";
 import Layout from "./Layout.jsx";
-import Login from "./Login.jsx";
-import Register from "./Register.jsx";
 import Dashboard from "./Dashboard.jsx";
 import Overview from "./Overview.jsx";
 import Budgets from "./Budgets.jsx";
 import SavingsWallet from "./SavingsWallet.jsx";
-import BankAccountdashboard from "./BankAccountdashboard.jsx"
+import BankAccountdashboard from "./BankAccountdashboard.jsx";
+import { SignIn, SignUp, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
 
 function App() {
   return (
@@ -30,7 +29,7 @@ function App() {
           path="/login"
           element={
             <Layout>
-              <Login />
+              <SignIn afterSignInUrl="/dashboard" />
             </Layout>
           }
         />
@@ -38,66 +37,71 @@ function App() {
           path="/register"
           element={
             <Layout>
-              <Register />
+              <SignUp afterSignUpUrl="/dashboard" />
             </Layout>
           }
         />
         <Route
           path="/dashboard"
           element={
-            <Layout>
-              <Dashboard/>
-            </Layout>
+            <SignedIn>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </SignedIn>
           }
         />
         <Route
           path="/overview"
           element={
-            <Layout>
-              <Overview/>
-            </Layout>
+            <SignedIn>
+              <Layout>
+                <Overview />
+              </Layout>
+            </SignedIn>
           }
         />
         <Route
-          path="/Budgets"
+          path="/budgets"
           element={
-            <Layout>
-              <Budgets/>
-            </Layout>
+            <SignedIn>
+              <Layout>
+                <Budgets />
+              </Layout>
+            </SignedIn>
           }
         />
         <Route
           path="/savingswallet"
           element={
-            <Layout>
-              <SavingsWallet/>
-            </Layout>
+            <SignedIn>
+              <Layout>
+                <SavingsWallet />
+              </Layout>
+            </SignedIn>
           }
         />
-         <Route
-          path="/BankAccountdashboard"
+        <Route
+          path="/bankaccountdashboard"
           element={
-            <Layout>
-              <BankAccountdashboard/>
-            </Layout>
+            <SignedIn>
+              <Layout>
+                <BankAccountdashboard />
+              </Layout>
+            </SignedIn>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <SignedOut>
+              <RedirectToSignIn />
+            </SignedOut>
           }
         />
       </Routes>
     </Router>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 export default App;

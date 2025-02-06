@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { PieChart, Pie, Cell, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import Sidebar from "./Sidebar.jsx";
 import "./Overview.css";
@@ -12,48 +11,47 @@ export default function Overview() {
     const [incomeExpensesData, setIncomeExpensesData] = useState([]);
     const [period, setPeriod] = useState('day');
     const [date, setDate] = useState(new Date());
-    const userId = localStorage.getItem('userId');
 
     useEffect(() => {
-        axios.get(`http://localhost:3000/transactions?userId=${userId}`)
-            .then(response => {
-                setTransactions(response.data);
-            })
-            .catch(error => {
-                console.error("There was an error fetching the transactions!", error);
-            });
+        // Fetch transactions from localStorage
+        const storedTransactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        setTransactions(storedTransactions);
 
-        axios.get(`http://localhost:3000/balance-over-time?userId=${userId}`)
-            .then(response => {
-                setBalanceData(response.data);
-            })
-            .catch(error => {
-                console.error("There was an error fetching the balance data!", error);
-            });
+        // Simulate balance over time data (could be based on transactions)
+        const balanceHistory = generateBalanceHistory(storedTransactions);
+        setBalanceData(balanceHistory);
 
-    
-        fetchIncomeExpensesData(period, date);
-    }, [userId, period, date]);
+        // Simulate income and expenses data (could be based on period and date)
+        const incomeExpenseHistory = generateIncomeExpenseHistory(period, date, storedTransactions);
+        setIncomeExpensesData(incomeExpenseHistory);
+    }, [period, date]);
 
-    const fetchIncomeExpensesData = (period, date) => {
-        axios.get(`http://localhost:3000/income-expenses?userId=${userId}&period=${period}&date=${date.toISOString().split('T')[0]}`)
-            .then(response => {
-                setIncomeExpensesData(response.data);
-            })
-            .catch(error => {
-                console.error("There was an error fetching the income and expenses data!", error);
-            });
+    const generateBalanceHistory = (transactions) => {
+        let balance = 0;
+        const history = [];
+        transactions.forEach(transaction => {
+            balance += transaction.type === "Credit" ? transaction.amount : -transaction.amount;
+            history.push({ date: transaction.date, balance });
+        });
+        return history;
     };
 
-    const handlePeriodChange = (event) => {
-        setPeriod(event.target.value);
+    const generateIncomeExpenseHistory = (period, date, transactions) => {
+        const incomeExpense = transactions.reduce((acc, transaction) => {
+            if (transaction.type === "Credit") {
+                acc.income += transaction.amount;
+            } else {
+                acc.expenses += transaction.amount;
+            }
+            return acc;
+        }, { income: 0, expenses: 0 });
+
+        return [
+            { name: 'Income', value: incomeExpense.income },
+            { name: 'Expenses', value: incomeExpense.expenses },
+        ];
     };
 
-    const handleDateChange = (date) => {
-        setDate(date);
-    };
-
-  
     const categoryData = transactions.reduce((acc, transaction) => {
         const { category, amount } = transaction;
         if (!acc[category]) {
@@ -74,6 +72,14 @@ export default function Overview() {
     const formatXAxis = (tickItem) => {
         const date = new Date(tickItem);
         return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    };
+
+    const handlePeriodChange = (event) => {
+        setPeriod(event.target.value);
+    };
+
+    const handleDateChange = (date) => {
+        setDate(date);
     };
 
     return (
@@ -136,10 +142,10 @@ export default function Overview() {
                         </LineChart>
                     </ResponsiveContainer>
 
-                    
+                    {/* Optional: Date picker for filtering data by date */}
+                    <DatePicker selected={date} onChange={handleDateChange} />
                 </div>
             </div>
         </div>
     );
 }
-

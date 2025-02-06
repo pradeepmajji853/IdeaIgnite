@@ -1,157 +1,98 @@
 import React, { useState, useEffect } from 'react';
-import './BudgetForm.css';
+import Sidebar from "./Sidebar.jsx";
+import Button from '@mui/material/Button';
+import BudgetForm from "./BudgetForm.jsx";
+import './Budgets.css';
 
-export default function BudgetForm({ onFormSubmit }) {
-  const [formData, setFormData] = useState({
-    budgetName: '',
-    amount: '',
-    currency: 'USD',
-    category: '',
-    recurrence: 'Monthly',
-    startDate: '',
-    endDate: '',
-  });
+export default function Budgets() {
+  const [showForm, setShowForm] = useState(false);
+  const [budgets, setBudgets] = useState([]);
 
-  useEffect(() => {
-    if (formData.startDate) {
-      const startDate = new Date(formData.startDate);
-      let endDate;
-      if (formData.recurrence === 'Monthly') {
-        endDate = new Date(startDate);
-        endDate.setMonth(startDate.getMonth() + 1);
-      } else if (formData.recurrence === 'Yearly') {
-        endDate = new Date(startDate);
-        endDate.setFullYear(startDate.getFullYear() + 1);
-      }
-      setFormData({ ...formData, endDate: endDate.toISOString().split('T')[0] });
-    }
-  }, [formData.recurrence, formData.startDate]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  // Function to fetch and update budgets
+  const fetchBudgets = () => {
+    const storedBudgets = JSON.parse(localStorage.getItem('budgets')) || [];
+    setBudgets(storedBudgets);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onFormSubmit(formData);
+  useEffect(() => {
+    fetchBudgets();
+  }, []);
+
+  const handleFormSubmit = (newBudget) => {
+    // Save the new budget to localStorage
+    const updatedBudgets = [...budgets, newBudget];
+    localStorage.setItem('budgets', JSON.stringify(updatedBudgets));
+    fetchBudgets(); // Re-fetch updated budgets
+    setShowForm(false);
+  };
+
+  // Get transactions from localStorage
+  const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+  // Function to calculate spent & remaining for each budget
+  const calculateBudgetDetails = (budget) => {
+    const categoryTransactions = transactions.filter(
+      (t) => t.category === budget.category && t.type === "debit"
+    );
+
+    const spentAmount = categoryTransactions.reduce((acc, t) => acc + t.amount, 0);
+    const remainingAmount = budget.amount - spentAmount;
+
+    return { spentAmount, remainingAmount };
   };
 
   return (
-    <form className="budget-form" onSubmit={handleSubmit}>
-      <h2 className="form-title">Add New Budget</h2>
-      <div className="form-group">
-        <label className="form-label" htmlFor="budgetName">Budget Name</label>
-        <input
-          type="text"
-          id="budgetName"
-          name="budgetName"
-          className="form-input"
-          value={formData.budgetName}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label className="form-label" htmlFor="amount">Amount</label>
-        <input
-          type="number"
-          id="amount"
-          name="amount"
-          className="form-input"
-          value={formData.amount}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label className="form-label" htmlFor="currency">Currency</label>
-        <select
-          id="currency"
-          name="currency"
-          className="form-select"
-          value={formData.currency}
-          onChange={handleChange}
-        >
-          <option value="USD">USD</option>
-          <option value="INR">INR</option>
-        </select>
-      </div>
-      <div className="form-group">
-        <label className="form-label" htmlFor="category">Category</label>
-        <select
-          id="category"
-          name="category"
-          className="form-select"
-          value={formData.category}
-          onChange={handleChange}
-        >
-          <option value="">Select category</option>
-          <option value="All categories">All categories</option>
-          <option value="Beauty">Beauty</option>
-          <option value="Bills & fees">Bills & fees</option>
-          <option value="Car">Car</option>
-          <option value="Education">Education</option>
-          <option value="Entertainment">Entertainment</option>
-          <option value="Family & Personal">Family & Personal</option>
-          <option value="Food & Drink">Food & Drink</option>
-          <option value="Gifts">Gifts</option>
-          <option value="Groceries">Groceries</option>
-          <option value="Health">Health</option>
-          <option value="Home">Home</option>
-          <option value="Others">Others</option>
-          <option value="Shopping">Shopping</option>
-          <option value="Sports & Hobbies">Sports & Hobbies</option>
-          <option value="Transport">Transport</option>
-          <option value="Travel">Travel</option>
-          <option value="Work">Work</option>
-        </select>
-      </div>
-      <div className="form-group">
-        <label className="form-label" htmlFor="recurrence">Recurrence</label>
-        <div className="recurrence-options">
-          <button
-            type="button"
-            className={`recurrence-button ${formData.recurrence === 'Monthly' ? 'active' : ''}`}
-            onClick={() => setFormData({ ...formData, recurrence: 'Monthly' })}
+    <div className="outerbudgets">
+      <Sidebar />
+      <div className="Budgets">
+        <div className="BudgetCard">
+          <p>Control your expenses with our smart budgets</p>
+          <Button
+            variant="contained"
+            color="success"
+            className="AddBudgetButton"
+            onClick={() => setShowForm(true)}
           >
-            Monthly
-          </button>
-          <button
-            type="button"
-            className={`recurrence-button ${formData.recurrence === 'Yearly' ? 'active' : ''}`}
-            onClick={() => setFormData({ ...formData, recurrence: 'Yearly' })}
-          >
-            Yearly
-          </button>
+            Add Budget
+          </Button>
+        </div>
+
+        {showForm && (
+          <div className="modal-overlay" onClick={() => setShowForm(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <BudgetForm onFormSubmit={handleFormSubmit} />
+            </div>
+          </div>
+        )}
+
+        <div className="BudgetList">
+          {budgets.map((budget, index) => {
+            const { spentAmount, remainingAmount } = calculateBudgetDetails(budget);
+            return (
+              <div className="BudgetCard" key={index}>
+                <h3>{budget.budgetName}</h3>
+                <div className="progress-bar">
+                  <div
+                    className="progress-bar-spent"
+                    style={{ width: `${(spentAmount / budget.amount) * 100}%` }}
+                  ></div>
+                  <div
+                    className="progress-bar-remaining"
+                    style={{ width: `${(remainingAmount / budget.amount) * 100}%` }}
+                  ></div>
+                </div>
+                <p><strong>Amount:</strong> {budget.amount} {budget.currency}</p>
+                <p><strong>Spent:</strong> {spentAmount} {budget.currency}</p>
+                <p><strong>Remaining:</strong> {remainingAmount} {budget.currency}</p>
+                <p><strong>Category:</strong> {budget.category}</p>
+                <p><strong>Recurrence:</strong> {budget.recurrence}</p>
+                <p><strong>Start Date:</strong> {budget.startDate}</p>
+                <p><strong>End Date:</strong> {budget.endDate}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
-      <div className="form-group">
-        <label className="form-label" htmlFor="startDate">Start Date</label>
-        <input
-          type="date"
-          id="startDate"
-          name="startDate"
-          className="form-input"
-          value={formData.startDate}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label className="form-label" htmlFor="endDate">End Date</label>
-        <input
-          type="date"
-          id="endDate"
-          name="endDate"
-          className="form-input"
-          value={formData.endDate}
-          onChange={handleChange}
-          required
-          readOnly
-        />
-      </div>
-      <button type="submit" className="submit-button">Add Budget</button>
-    </form>
+    </div>
   );
 }

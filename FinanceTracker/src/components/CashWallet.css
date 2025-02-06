@@ -1,62 +1,170 @@
+/* Ensure full page layout */
 .CashWallet {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
-  
-  .CWcard {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 300px;
-    height: 150px; 
-    margin: 20px 0;
+  font-family: 'Arial', sans-serif;
+  min-height: 100vh;
+  width: 100%;
+  padding: 40px 20px;
+  background-color: #f4f7fb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Main Card Styling */
+.CWcard {
+  width: 90%;
+  max-width: 800px;
+  display: flex;
+  justify-content: space-between;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  align-items: center;
+}
+
+.CWicon {
+  font-size: 3rem;
+  color: #4caf50;
+}
+
+.CWcontent {
+  text-align: right;
+}
+
+.CWcontent h2 {
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.CWcontent h3 {
+  font-size: 1.4rem;
+  margin: 5px 0;
+}
+
+/* Transaction Section */
+.TL {
+  width: 90%;
+  max-width: 800px;
+  margin-top: 40px;
+}
+
+.transactions-list {
+  width: 100%;
+}
+
+.transactions-list ul {
+  list-style-type: none;
+  padding: 0;
+  width: 100%;
+}
+
+.transactions-list li {
+  background-color: #ffffff;
+  padding: 16px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2rem;
+}
+
+.transactions-list .credit {
+  color: green;
+}
+
+.transactions-list .debit {
+  color: red;
+}
+
+/* Buttons */
+.add-transaction-btn, .transaction-form button, .close-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-transaction-btn {
+  background-color: #179107;
+  width: 200px;
+  color: white;
+}
+
+.add-transaction-btn:hover {
+  background-color: #0db82f;
+}
+
+.close-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.close-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* Form Modal */
+.transaction-form-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.transaction-form {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  z-index: 2;
+  width: 400px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.transaction-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.transaction-form label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.transaction-form input,
+.transaction-form select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+/* Ensure transactions fill the width */
+@media (min-width: 768px) {
+  .transactions-list li {
     padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.2s;
-    background-color: white;
+    font-size: 1.3rem;
   }
-  
-  .CWcard:hover {
-    transform: scale(1.15);
-  }
-  
-  .CWicon {
-    margin-right: 20px;
-  }
-  
-  .CWcontent h2 {
-    margin: 0;
-    font-size: 24px;
-  }
-  
-  .CWcontent h3 {
-    margin: 5px 0;
-    font-size: 18px;
-  }
-  
-  .TL {
-    width: 100%;
-    padding: 0 20px;
-  }
-  
-  .TL table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .TL th,
-  .TL td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .TL th {
-    background-color: #4CAF50;
-    color: white;
-  }
-  
+}
+
