@@ -1,6 +1,6 @@
 import "./App.css";
 import Heropage from "./Heropage.jsx";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Features from "./Features.jsx";
 import Getstarted from "./Getstarted.jsx";
 import Layout from "./Layout.jsx";
@@ -15,6 +15,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Public Routes */}
         <Route
           path="/"
           element={
@@ -25,6 +26,8 @@ function App() {
             </Layout>
           }
         />
+
+        {/* Auth Routes */}
         <Route
           path="/login"
           element={
@@ -41,6 +44,8 @@ function App() {
             </Layout>
           }
         />
+
+        {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={
@@ -91,6 +96,8 @@ function App() {
             </SignedIn>
           }
         />
+
+        {/* Catch-all Route for SignedOut Users */}
         <Route
           path="*"
           element={
@@ -98,6 +105,12 @@ function App() {
               <RedirectToSignIn />
             </SignedOut>
           }
+        />
+
+        {/* Fallback Route for Unauthorized Access */}
+        <Route
+          path="/unauthorized"
+          element={<Navigate to="/login" />}
         />
       </Routes>
     </Router>
